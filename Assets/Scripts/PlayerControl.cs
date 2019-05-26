@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerControl : MonoBehaviour {
@@ -9,10 +10,12 @@ public class PlayerControl : MonoBehaviour {
     public static event PlayerDelegate OnPlayerDied;
     public static event PlayerDelegate OnPlayerScored;
 
-
     public float tapForce = 10f;
     public float tiltSmooth = 5f;
     public Vector3 startPos;
+
+    public AudioSource flapAudio;
+    public AudioSource dieAudio;
 
     Rigidbody2D rb;
     Quaternion downRotation;
@@ -31,11 +34,13 @@ public class PlayerControl : MonoBehaviour {
     private void OnEnable() {
         GameManager.OnGameStarted += OnGameStarted;
         GameManager.OnGameOverConfirmed += OnGameOverConfirmed;
+        GameManager.BackToMenu += BackToMenu;
     }
 
     private void OnDisable() {
         GameManager.OnGameStarted -= OnGameStarted;
         GameManager.OnGameOverConfirmed -= OnGameOverConfirmed;
+        GameManager.BackToMenu -= BackToMenu;
     }
 
     void OnGameStarted() {
@@ -47,10 +52,19 @@ public class PlayerControl : MonoBehaviour {
         transform.rotation = Quaternion.identity;
     }
 
+    void BackToMenu() {
+        rb.simulated = false;
+    }
+
     private void Update() {
         if (gameManager.GameOver) return;
 
         if (Input.GetMouseButtonDown(0)) {
+            // Add eventSystem to detect UI click
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            flapAudio.Play();
             transform.rotation = forwardRotation;
             // To restart the velocity
             rb.velocity = Vector3.zero;
@@ -72,6 +86,7 @@ public class PlayerControl : MonoBehaviour {
             // dead event
             OnPlayerDied(); // event sent to gameManager
             // play sound
+            dieAudio.Play();
 
         }
     }

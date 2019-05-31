@@ -15,7 +15,7 @@ public class PlayerControl : MonoBehaviour {
     public Vector3 startPos;
 
     public AudioSource flapAudio;
-    public AudioSource dieAudio;
+    public AudioSource dieAudio1, dieAudio2, dieAudio3, dieAudio4;
 
     Rigidbody2D rb;
     Quaternion downRotation;
@@ -56,12 +56,22 @@ public class PlayerControl : MonoBehaviour {
         rb.simulated = false;
     }
 
+    private bool IsPointerOverUIObject() {
+        // TODO
+        // Check how it works
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
+    }
+
     private void Update() {
         if (gameManager.GameOver) return;
 
         if (Input.GetMouseButtonDown(0)) {
             // Add eventSystem to detect UI click
-            if (EventSystem.current.IsPointerOverGameObject())
+            if (EventSystem.current.IsPointerOverGameObject() || IsPointerOverUIObject())
                 return;
 
             flapAudio.Play();
@@ -85,9 +95,26 @@ public class PlayerControl : MonoBehaviour {
             rb.simulated = false;
             // dead event
             OnPlayerDied(); // event sent to gameManager
-            // play sound
-            dieAudio.Play();
-
+            // Create random num and play dieAudio
+            int ran = Random.Range(1, 5);
+            Debug.Log(ran);
+            switch (ran) {
+                case 1:
+                    dieAudio1.Play();
+                    break;
+                case 2:
+                    dieAudio2.Play();
+                    break;
+                case 3:
+                    dieAudio3.Play();
+                    break;
+                case 4:
+                    dieAudio4.Play();
+                    break;
+                default:
+                    System.Console.WriteLine("Something went wrong");
+                    break;
+            }
         }
     }
 

@@ -66,6 +66,7 @@ public class GameManager : MonoBehaviour {
     void OnPlayerDied() {
         AudioManager.Instance.StopMusic(gameMusic);
         gameOver = true;
+        pauseButton.SetActive(false);
         int savedScore = PlayerPrefs.GetInt("HighScore");
         if(score > savedScore) {
             PlayerPrefs.SetInt("HighScore", score);

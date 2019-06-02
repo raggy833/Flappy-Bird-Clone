@@ -73,6 +73,7 @@ public class GameManager : MonoBehaviour {
         }
         SetPageState(PageState.GameOver);
     }
+
     void OnPlayerScored() {
         score++;
         scoreText.text = score.ToString();
